@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.vinil.the_game.tworoadsassignment.StartActivity"
+    tools:showIn="@layout/activity_start">
+
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/ipAddressEditText"
+        android:layout_centerHorizontal="true"
+        android:hint="xxx.xxx.xxx.xxx"/>
+
+    <TextView
+        android:id="@+id/ipAddressTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/ipAddressEditText"
+        android:layout_toLeftOf="@id/ipAddressEditText"
+        android:text="IP : "
+        android:textSize="25dp"/>
+
+    <EditText
+        android:layout_alignLeft="@id/ipAddressEditText"
+        android:layout_below="@id/ipAddressEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/portNumberEditText"
+        android:hint="[1024 - 65535]"/>
+
+    <TextView
+        android:id="@+id/portNumberTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/portNumberEditText"
+        android:layout_toLeftOf="@+id/portNumberEditText"
+        android:text="Port : "
+        android:textSize="25dp"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start"
+        android:id="@+id/startButton"
+        android:layout_below="@+id/portNumberEditText"
+        android:layout_centerHorizontal="true" />
+
+</RelativeLayout>

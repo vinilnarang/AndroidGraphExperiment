@@ -13,7 +13,7 @@
     tools:showIn="@layout/activity_main">
 
     <TextView
-        android:id="@+id/textview"
+        android:id="@+id/helloTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Hello World!"
@@ -21,7 +21,7 @@
 
     <com.vinil.the_game.tworoadsassignment.CustomView
         android:id="@+id/customView"
-        android:layout_below="@+id/textview"
+        android:layout_below="@+id/helloTextView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         />

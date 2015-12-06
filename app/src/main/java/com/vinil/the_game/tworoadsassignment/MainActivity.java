@@ -1,5 +1,6 @@
 package com.vinil.the_game.tworoadsassignment;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -17,14 +18,11 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-import org.apache.http.HttpClientConnection;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.DefaultHttpClientConnection;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,12 +40,16 @@ public class MainActivity extends AppCompatActivity {
     public HttpURLConnection httpURLConnection;
     public InputStream inputStream;
     public BufferedReader bufferedReader;
+    public String urlString = "http://192.168.0.105:48129/";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        tv = (TextView)findViewById(R.id.textview);
+        Intent intent = getIntent();
+        urlString = intent.getStringExtra("url");
+        tv = (TextView)findViewById(R.id.helloTextView);
         customView = (CustomView) findViewById(R.id.customView);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -58,12 +60,12 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Snackbar.make(view, " Started data fetching!", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                function3();
+                startFetchingData();
             }
         });
     }
 
-    public void function3(){
+    public void startFetchingData(){
         asyncTask = new AsyncTask() {
 
             @Override
@@ -83,11 +85,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             protected Object doInBackground(Object[] params) {
-                String url = "http://192.168.0.105:48129/";
-                //String url = "http://api.androidhive.info/contacts/";
                 URL url1;
                 try {
-                    url1 = new URL("http://192.168.0.105:48129/");
+                    url1 = new URL(urlString);
                     httpURLConnection = (HttpURLConnection)url1.openConnection();
                     inputStream = httpURLConnection.getInputStream();
                     bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
         asyncTask.execute();
     }
 
-    public void function2() throws IOException {
+    /*public void function2() throws IOException {
 
         AsyncTask asyncTask = new AsyncTask() {
             @Override
@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Add the request to the queue
         Volley.newRequestQueue(this).add(stringRequest);
-    }
+    }*/
 
 
 
