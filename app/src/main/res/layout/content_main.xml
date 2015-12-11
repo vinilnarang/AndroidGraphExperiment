@@ -12,19 +12,99 @@
     tools:context="com.vinil.the_game.tworoadsassignment.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <TextView
-        android:id="@+id/helloTextView"
+
+    <ToggleButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:id="@+id/toggleButton"
+        android:textOn="Stop"
+        android:textOff="Start"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_below="@+id/toggleButton"
+        android:layout_marginTop="0dp"
+        android:id="@+id/helloTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:text=""
         android:layout_centerHorizontal="true"/>
 
-    <com.vinil.the_game.tworoadsassignment.CustomView
-        android:id="@+id/customView"
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/helloTextView"
+        android:layout_above="@+id/buttonsLL"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <com.jjoe64.graphview.helper.GraphViewXML
+                android:layout_marginTop="10dp"
+                android:id="@+id/buyItemsGraph"
+                android:layout_width="match_parent"
+                android:layout_height="200dip"
+                app:seriesData="-1=0"
+                android:title="Graph Title" />
+
+            <com.jjoe64.graphview.helper.GraphViewXML
+                android:id="@+id/buyBestPriceGraph"
+                android:layout_width="match_parent"
+                android:layout_below="@+id/buyItemsGraph"
+                android:layout_height="200dip"
+                app:seriesData="-1=0"
+                android:title="Graph Title" />
+
+            <com.jjoe64.graphview.helper.GraphViewXML
+                android:id="@+id/sellItemsGraph"
+                android:layout_width="match_parent"
+                android:layout_below="@+id/buyBestPriceGraph"
+                android:layout_height="200dip"
+                app:seriesData="-1=0"
+                android:title="Graph Title" />
+
+            <com.jjoe64.graphview.helper.GraphViewXML
+                android:layout_marginBottom="10dp"
+                android:id="@+id/sellBestPriceGraph"
+                android:layout_width="match_parent"
+                android:layout_below="@+id/sellItemsGraph"
+                android:layout_height="200dip"
+                app:seriesData="-1=0"
+                android:title="Graph Title" />
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/buttonsLL"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/buyStockButton"
+            android:text="Buy Stock"
+            android:textColor="#000000"
+            android:background="@drawable/button_border"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/sellStockButton"
+            android:text="Sell Stock"
+            android:textColor="#000000"
+            android:background="@drawable/button_border"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
 
 
 </RelativeLayout>

@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -22,6 +23,7 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.util.Scanner;
 import java.util.regex.Pattern;
 
 public class StartActivity extends AppCompatActivity {
@@ -39,56 +41,12 @@ public class StartActivity extends AppCompatActivity {
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String ip = ipAddressEditText.getText().toString().trim();
-                final String port = portNumberEditText.getText().toString().trim();
+                String ip = ipAddressEditText.getText().toString().trim();
+                String port = portNumberEditText.getText().toString().trim();
                 boolean isIPValid = checkIfIPValid(ip);
                 boolean isPortValid = checkIfPortValid(port);
                 if(isIPValid&&isPortValid){
-                    AsyncTask asyncTask = new AsyncTask() {
-                        boolean exists = false;
-                        ProgressDialog dialog = new ProgressDialog(StartActivity.this);
-
-                        @Override
-                        protected void onPreExecute() {
-                            dialog.setMessage("Please wait");
-                            dialog.show();
-                        }
-
-                        @Override
-                        protected Object doInBackground(Object[] params) {
-                            try {
-                                SocketAddress sockaddr = new InetSocketAddress(ip,Integer.parseInt(port));
-                                // Create an unbound socket
-                                Socket sock = new Socket();
-
-                                // This method will block no more than timeoutMs.
-                                // If the timeout occurs, SocketTimeoutException is thrown.
-                                int timeoutMs = 2000;   // 2 seconds
-                                sock.connect(sockaddr, timeoutMs);
-                                exists = true;
-                            }catch(SocketTimeoutException e){
-                                e.printStackTrace();
-                            }catch (IOException e){
-                                e.printStackTrace();
-                            }
-                            return null;
-                        }
-
-                        @Override
-                        protected void onPostExecute(Object o) {
-                            if(dialog.isShowing()){
-                                dialog.dismiss();
-                            }
-                            if(exists==true) {
-                                Intent intent = new Intent(StartActivity.this, MainActivity.class);
-                                intent.putExtra("url", "http://" + ip + ":" + port);
-                                startActivity(intent);
-                            }else{
-                                Toast.makeText(StartActivity.this,"Not reachable! Please try again later!",Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    };
-                    asyncTask.execute();
+                    startActivityIfIpIsReachable(ip, port);
                 }else{
                     Toast.makeText(StartActivity.this,"Please enter valid IP/Port!",Toast.LENGTH_SHORT).show();
                 }
@@ -99,16 +57,81 @@ public class StartActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
     }
 
+    public void startActivityIfIpIsReachable(final String ip, final String port){
+        AsyncTask asyncTask = new AsyncTask() {
+            boolean exists = false;
+            ProgressDialog dialog = new ProgressDialog(StartActivity.this);
+
+            @Override
+            protected void onPreExecute() {
+                dialog.setMessage("Please wait");
+                dialog.show();
+            }
+
+            @Override
+            protected Object doInBackground(Object[] params) {
+                Socket sock = new Socket();
+                try {
+                    SocketAddress sockaddr = new InetSocketAddress(ip,Integer.parseInt(port));
+                    // This method will block no more than timeoutMs.
+                    // If the timeout occurs, SocketTimeoutException is thrown.
+                    int timeoutMs = 2000;   // 2 seconds
+                    sock.connect(sockaddr, timeoutMs);
+                    exists = true;
+                }catch(SocketTimeoutException e){
+                    e.printStackTrace();
+                }catch (IOException e){
+                    e.printStackTrace();
+                }finally {
+                    if(sock!=null) {
+                        try {
+                            if (!sock.isClosed()) {
+                                sock.close();
+                            }
+                            ;
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Object o) {
+                if(dialog.isShowing()){
+                    dialog.dismiss();
+                }
+                if(exists==true) {
+                    Intent intent = new Intent(StartActivity.this, MainActivity.class);
+                    intent.putExtra("url", "http://" + ip + ":" + port);
+                    startActivity(intent);
+                }else{
+                    Toast.makeText(StartActivity.this,"Not reachable! Please try again later!",Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+        asyncTask.execute();
+        return;
+    }
+
     public boolean checkIfIPValid(String ip){
         return PATTERN.matcher(ip).matches();
     }
 
     public boolean checkIfPortValid(String port){
-        int portInt = Integer.parseInt(port);
-        if(portInt>1023 && portInt<65536) {
-            return true;
+        if(port==""){
+            return false;
         }
-        else{
+        try {
+            int portInt = Integer.parseInt(port);
+            if (portInt > 1023 && portInt < 65536) {
+                return true;
+            } else {
+                return false;
+            }
+        }catch (NumberFormatException e){
+            e.printStackTrace();
             return false;
         }
     }
