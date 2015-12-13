@@ -83,7 +83,6 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         buyStockButton = (Button) findViewById(R.id.buyStockButton);
         buyStockButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -328,74 +327,6 @@ public class MainActivity extends AppCompatActivity {
         System.out.println("HttpURLConnection Closed!");
         return;
     }
-
-    /*public void function2() throws IOException {
-
-        AsyncTask asyncTask = new AsyncTask() {
-            @Override
-            protected Object doInBackground(Object[] params) {
-
-                try{
-                    String url = "http://192.168.0.105:48129/";
-                    //String url = "http://api.androidhive.info/contacts/";
-                    HttpClient httpclient = new DefaultHttpClient();
-                    HttpResponse response = httpclient.execute(new HttpGet(url));
-
-                    if(response.getEntity().isStreaming()){
-                        HttpEntity _entity = response.getEntity();
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(_entity.getContent(),"utf-8"),8);
-                        String line = null;
-                        while ((line = reader.readLine()) != null) {
-                            System.out.println( line.toString());
-                        }
-//                        _entity.getContent().close();
-                    }
-
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Object o) {
-                super.onPostExecute(o);
-                tv.setText("Fetched!");
-            }
-        };
-        asyncTask.execute();
-    }
-
-    public void function(){
-
-        String url = "http://192.168.0.105:48129/";
-
-        // Request a string response
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>(){
-                    @Override
-                    public void onResponse(String response) {
-
-                        // Result handling
-                        System.out.println(response.substring(0,100));
-                        tv.setText(response.substring(0,100));
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                // Error handling
-                System.out.println("Something went wrong!");
-                error.printStackTrace();
-
-            }
-        });
-
-        // Add the request to the queue
-        Volley.newRequestQueue(this).add(stringRequest);
-    }*/
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
