@@ -12,4 +12,20 @@
     tools:context="com.vinil.the_game.tworoadsassignment.OrdersActivity"
     tools:showIn="@layout/activity_orders">
 
+    <TextView
+        android:id="@+id/orderTypeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="25dp"
+        android:text="Order Type"
+        android:layout_centerHorizontal="true"/>
+
+    <android.support.v4.view.ViewPager
+        android:layout_below="@id/orderTypeTextView"
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </android.support.v4.view.ViewPager>
+
 </RelativeLayout>
