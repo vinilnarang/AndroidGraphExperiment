@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">TwoRoadsAssignment</string>
     <string name="action_settings">Settings</string>
+    <string name="action_orders">Orders</string>
     <string name="title_activity_start">StartActivity</string>
+    <string name="title_activity_orders">OrdersActivity</string>
 </resources>

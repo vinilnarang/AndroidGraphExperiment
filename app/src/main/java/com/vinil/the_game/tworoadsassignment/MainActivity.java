@@ -1,15 +1,19 @@
 package com.vinil.the_game.tworoadsassignment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -84,14 +88,14 @@ public class MainActivity extends AppCompatActivity {
         buyStockButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this,"Buy Something!",Toast.LENGTH_SHORT).show();
+                showAlertForOrderType("buy");
             }
         });
         sellStockButton = (Button) findViewById(R.id.sellStockButton);
         sellStockButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this,"Sell Something!",Toast.LENGTH_SHORT).show();
+                showAlertForOrderType("sell");
             }
         });
         toggleButton = (ToggleButton) findViewById(R.id.toggleButton);
@@ -100,8 +104,6 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     //The toggle is enabled
-                    //Snackbar.make(buttonView, " Started data fetching!", Snackbar.LENGTH_SHORT)
-                    //        .setAction("Action", null).show();
                     startFetchingData();
                 } else {
                     //The toggle is disabled
@@ -136,31 +138,7 @@ public class MainActivity extends AppCompatActivity {
                 super.onProgressUpdate(values);
                 count++;
                 String data = (String)values[0];
-                String[] elements = data.split(",");
-                String buyBestPrice = elements[2].trim();
-                String sellBestPrice = elements[4].trim();
-                String buyItems = elements[3].trim();
-                String sellItems = elements[5].split("\n")[0].trim();
-                DataPoint sellItemDataPoint = new DataPoint(count,Integer.parseInt(sellItems));
-                DataPoint buyItemDataPoint = new DataPoint(count,Integer.parseInt(buyItems));
-                DataPoint sellBestPriceDataPoint = new DataPoint(count,Double.parseDouble(sellBestPrice));
-                DataPoint buyBestPriceDataPoint = new DataPoint(count,Double.parseDouble(buyBestPrice));
-                buyItemsGraph.setTitle("#Buy Items : "+buyItems);
-                sellItemsGraph.setTitle("#Sell Items : "+sellItems);
-                buyBestPriceGraph.setTitle("#Buy Best Price : "+buyBestPrice);
-                sellBestPriceGraph.setTitle("#Sell Best Price : "+sellBestPrice);
-                if(count>=SCROLL_LIMIT) {
-                    sellItemsSeries.appendData(sellItemDataPoint, true, SCROLL_LIMIT);
-                    buyItemsSeries.appendData(buyItemDataPoint, true, SCROLL_LIMIT);
-                    sellBestPriceSeries.appendData(sellBestPriceDataPoint, true, SCROLL_LIMIT);
-                    buyBestPriceSeries.appendData(buyBestPriceDataPoint, true, SCROLL_LIMIT);
-                }
-                else {
-                    sellItemsSeries.appendData(sellItemDataPoint, false, SCROLL_LIMIT);
-                    buyItemsSeries.appendData(buyItemDataPoint, false, SCROLL_LIMIT);
-                    sellBestPriceSeries.appendData(sellBestPriceDataPoint, false, SCROLL_LIMIT);
-                    buyBestPriceSeries.appendData(buyBestPriceDataPoint, false, SCROLL_LIMIT);
-                }
+                plotGraphAndStoreData(data);
                 return;
             }
 
@@ -208,6 +186,115 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         asyncTask.execute();
+    }
+
+    public void plotGraphAndStoreData(String data){
+
+        String[] elements = data.split(",");
+        String buyBestPrice = elements[2].trim();
+        String sellBestPrice = elements[4].trim();
+        String buyItems = elements[3].trim();
+        String sellItems = elements[5].split("\n")[0].trim();
+        DataPoint sellItemDataPoint = new DataPoint(count,Integer.parseInt(sellItems));
+        DataPoint buyItemDataPoint = new DataPoint(count,Integer.parseInt(buyItems));
+        DataPoint sellBestPriceDataPoint = new DataPoint(count,Double.parseDouble(sellBestPrice));
+        DataPoint buyBestPriceDataPoint = new DataPoint(count,Double.parseDouble(buyBestPrice));
+        buyItemsGraph.setTitle("#Buy Items : "+buyItems);
+        sellItemsGraph.setTitle("#Sell Items : "+sellItems);
+        buyBestPriceGraph.setTitle("#Buy Best Price : " + buyBestPrice);
+        sellBestPriceGraph.setTitle("#Sell Best Price : " + sellBestPrice);
+        if(count>=SCROLL_LIMIT) {
+            sellItemsSeries.appendData(sellItemDataPoint, true, SCROLL_LIMIT);
+            buyItemsSeries.appendData(buyItemDataPoint, true, SCROLL_LIMIT);
+            sellBestPriceSeries.appendData(sellBestPriceDataPoint, true, SCROLL_LIMIT);
+            buyBestPriceSeries.appendData(buyBestPriceDataPoint, true, SCROLL_LIMIT);
+        }
+        else {
+            sellItemsSeries.appendData(sellItemDataPoint, false, SCROLL_LIMIT);
+            buyItemsSeries.appendData(buyItemDataPoint, false, SCROLL_LIMIT);
+            sellBestPriceSeries.appendData(sellBestPriceDataPoint, false, SCROLL_LIMIT);
+            buyBestPriceSeries.appendData(buyBestPriceDataPoint, false, SCROLL_LIMIT);
+        }
+        return;
+
+    }
+
+    public void showAlertForOrderType(final String category){
+        CharSequence[] orderTypes = {"Market Order","Limit Order"};
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("Choose order type : ");
+        alertDialogBuilder.setSingleChoiceItems(orderTypes, -1, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case 0:
+                        showAlertForOrderInput(0, category);
+                        break;
+                    case 1:
+                        showAlertForOrderInput(1, category);
+                        break;
+                }
+                dialog.dismiss();
+            }
+        });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
+    public void showAlertForOrderInput(final int orderType, final String category){
+        if(orderType == 0) {
+            final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            alertDialogBuilder.setTitle("Enter number of orders : ");
+            View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.dialog_view_market, null);
+            final EditText editTextOrderMarket = (EditText) view.findViewById(R.id.editTextOrderMarket);
+            alertDialogBuilder.setView(view);
+            alertDialogBuilder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    confirmMarketOrder(Integer.parseInt(editTextOrderMarket.getText().toString().trim()), category);
+                }
+            });
+            alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        }else{
+            final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            alertDialogBuilder.setTitle("Enter number of orders : ");
+            View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.dialog_view_limit, null);
+            final EditText editTextOrderLimit = (EditText) view.findViewById(R.id.editTextOrderLimit);
+            final EditText editTextPriceLimit = (EditText) view.findViewById(R.id.editTextPriceLimit);
+            alertDialogBuilder.setView(view);
+            alertDialogBuilder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String price = editTextPriceLimit.getText().toString();
+                    String numOrders = editTextOrderLimit.getText().toString();
+                    confirmLimitOrder(price,numOrders,category);
+                }
+            });
+            alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        }
+    }
+
+    public void confirmMarketOrder(int numOrders, String category){
+        Toast.makeText(MainActivity.this,category+" Market Order : "+" Number : "+numOrders,Toast.LENGTH_SHORT).show();
+        return;
+    }
+
+    public void confirmLimitOrder(String price, String numOrders, String category){
+        Toast.makeText(MainActivity.this,category+" Limit Order : "+" Price : "+price+" Number : "+numOrders,Toast.LENGTH_SHORT).show();
     }
 
     public void closeBufferedReader(BufferedReader bufferedReader){
@@ -312,20 +399,17 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_orders) {
+            Intent intent = new Intent(MainActivity.this,OrdersActivity.class);
+            startActivity(intent);
             return true;
         }
 
