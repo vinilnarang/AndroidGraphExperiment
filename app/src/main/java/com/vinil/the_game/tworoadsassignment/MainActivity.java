@@ -1,8 +1,12 @@
 package com.vinil.the_game.tworoadsassignment;
 
 import android.app.AlertDialog;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -48,10 +52,13 @@ public class MainActivity extends AppCompatActivity {
     public LineGraphSeries<DataPoint> buyBestPriceSeries;
     public int count = -1 ;
     public static final int SCROLL_LIMIT = 11;
+    public SQLiteDatabase db;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        db = openOrCreateDatabase("StockDB", Context.MODE_PRIVATE, null);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Intent intent = getIntent();
@@ -189,11 +196,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void plotGraphAndStoreData(String data){
 
+        db.execSQL("CREATE TABLE IF NOT EXISTS stock(_ID INTEGER PRIMARY KEY AUTOINCREMENT,time VARCHAR, buyBestPrice VARCHAR," +
+                " buyItems VARCHAR, sellBestPrice VARCHAR, sellItems VARCHAR);");
         String[] elements = data.split(",");
+        String time = elements[0].trim();
         String buyBestPrice = elements[2].trim();
         String sellBestPrice = elements[4].trim();
         String buyItems = elements[3].trim();
         String sellItems = elements[5].split("\n")[0].trim();
+        db.execSQL("INSERT INTO stock VALUES('"+time+"','"+buyBestPrice+"','"+buyItems+"','"+sellBestPrice+"','"+sellItems+"');");
         DataPoint sellItemDataPoint = new DataPoint(count,Integer.parseInt(sellItems));
         DataPoint buyItemDataPoint = new DataPoint(count,Integer.parseInt(buyItems));
         DataPoint sellBestPriceDataPoint = new DataPoint(count,Double.parseDouble(sellBestPrice));
@@ -214,6 +225,8 @@ public class MainActivity extends AppCompatActivity {
             sellBestPriceSeries.appendData(sellBestPriceDataPoint, false, SCROLL_LIMIT);
             buyBestPriceSeries.appendData(buyBestPriceDataPoint, false, SCROLL_LIMIT);
         }
+        Cursor c=db.rawQuery("SELECT * FROM stock", null);
+        Toast.makeText(MainActivity.this,""+c.getCount(),Toast.LENGTH_SHORT).show();
         return;
 
     }
@@ -288,12 +301,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void confirmMarketOrder(int numOrders, String category){
-        Toast.makeText(MainActivity.this,category+" Market Order : "+" Number : "+numOrders,Toast.LENGTH_SHORT).show();
+        if(category=="buy") {
+            Cursor c = db.rawQuery("SELECT * FROM stock ORDER BY buyBestPrice ASC", null);
+            c.moveToFirst();
+            ContentValues contentValues = new ContentValues();
+            Toast.makeText(MainActivity.this, "Avl. Items : "+c.getString(2)+" Price : "+c.getString(1), Toast.LENGTH_SHORT).show();
+            if(Integer.parseInt(c.getString(2)) <= numOrders){
+                contentValues.put("buyItems","0");
+            }else{
+                contentValues.put("buyItems",""+(Integer.parseInt(c.getString(2))-numOrders));
+            }
+            db.update("stock",contentValues,"time='"+c.getString(0)+"'",null);
+            Toast.makeText(MainActivity.this, "Avl. Items : "+c.getString(2)+" Price : "+c.getString(1), Toast.LENGTH_SHORT).show();
+        }
         return;
     }
 
     public void confirmLimitOrder(String price, String numOrders, String category){
-        Toast.makeText(MainActivity.this,category+" Limit Order : "+" Price : "+price+" Number : "+numOrders,Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainActivity.this, category+" Limit Order : "+" Price : "+price+" Number : "+numOrders, Toast.LENGTH_SHORT).show();
     }
 
     public void closeBufferedReader(BufferedReader bufferedReader){
@@ -328,6 +353,12 @@ public class MainActivity extends AppCompatActivity {
         return;
     }
 
+    public void closeDatabaseConnection(){
+        if(db.isOpen()) {
+            db.close();
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -349,6 +380,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        closeDatabaseConnection();
         if(asyncTask!=null){
             asyncTask.cancel(true);
         }
