@@ -311,7 +311,7 @@ public class MainActivity extends AppCompatActivity {
             }else{
                 contentValues.put("buyItems",""+(Integer.parseInt(c.getString(2))-numOrders));
             }
-            db.update("stock",contentValues,"time='"+c.getString(0)+"'",null);
+            //db.update("stock",contentValues,"time='"+c.getString(0)+"'",null);
             Toast.makeText(MainActivity.this, "Avl. Items : "+c.getString(2)+" Price : "+c.getString(1), Toast.LENGTH_SHORT).show();
         }
         return;
